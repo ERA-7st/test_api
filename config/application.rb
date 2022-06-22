@@ -18,6 +18,10 @@ require "action_cable/engine"
 # you've limited to :test, :development, or :production.
 Bundler.require(*Rails.groups)
 
+class ApplicationController < ActionController::Base
+  protect_from_forgery with: :null_session
+end
+
 module TestApi
   class Application < Rails::Application
     # Initialize configuration defaults for originally generated Rails version.
