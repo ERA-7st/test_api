@@ -10,6 +10,11 @@ class IdeasController < ApplicationController
     else
       @ideas = Idea.all
     end
+    if @ideas
+      render json: @ideas
+    else
+      render json: 404, status: 404
+    end
   end
 
   def create
