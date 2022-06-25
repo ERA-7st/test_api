@@ -2,6 +2,19 @@ class IdeasController < ApplicationController
   protect_from_forgery
 
   def index
+    if params[:category_name].present?
+      category = Category.find_by(params[:category_name])
+    end
+    if category.present?
+      @ideas = category.ideas
+    else
+      @ideas = Idea.all
+    end
+    if @ideas
+      render json: @ideas
+    else
+      render json: 404, status: 404
+    end
   end
 
   def create
