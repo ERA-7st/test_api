@@ -12,15 +12,15 @@ class IdeasController < ApplicationController
   end
 
   def create
-    if category.present?
+    if @category.present?
       begin
-        @idea = category.ideas.create!(body: params[:body])
+        @idea = @category.ideas.create!(body: params[:body])
       rescue
       end
     else
       ActiveRecord::Base.transaction do
-        @category = Category.create!(name: params[:category_name])
-        @idea = @category.ideas.create!(body: params[:body])
+        @new_category = Category.create!(name: params[:category_name])
+        @idea = @new_category.ideas.create!(body: params[:body])
       rescue
         raise ActiveRecord::Rollback
       end
