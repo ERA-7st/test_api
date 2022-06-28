@@ -1,33 +1,26 @@
 class IdeasController < ApplicationController
   protect_from_forgery
+  before_action :set_category, only: [:index, :create]
 
   def index
-    if params[:category_name].present?
-      category = Category.find_by(params[:category_name])
-    end
-    if category.present?
-      @ideas = category.ideas
-    else
+    if params[:category_name].nil?
       @ideas = Idea.all
+    elsif @category
+      @ideas = @category.ideas
     end
-    if @ideas
-      render json: @ideas
-    else
-      render json: 404, status: 404
-    end
+    @ideas ? (render json: @ideas)  :  (render json: 404, status: 404)
   end
 
   def create
-    category = Category.find_by(name: params[:category_name])
-    if category.present?
+    if @category.present?
       begin
-        @idea = category.ideas.create!(body: params[:body])
+        @idea = @category.ideas.create!(body: params[:body])
       rescue
       end
     else
       ActiveRecord::Base.transaction do
-        @category = Category.create!(name: params[:category_name])
-        @idea = @category.ideas.create!(body: params[:body])
+        @new_category = Category.create!(name: params[:category_name])
+        @idea = @new_category.ideas.create!(body: params[:body])
       rescue
         raise ActiveRecord::Rollback
       end
@@ -38,4 +31,11 @@ class IdeasController < ApplicationController
       render json: 422, status: 422
     end
   end
+
+  private
+  
+  def set_category
+    @category = Category.find_by(name: params[:category_name])
+  end
+
 end
